@@ -54,14 +54,21 @@ public class Abbath extends PircBot {
 			sendMessage(channel, sender + ": Hello World");
 			break;
 		case "!setuser":
-
+			// We're gonna need a bigger boat
 			break;
 		case "!np":
-			findUserNowPlaying(channel, args[1]);
+			if (args.length > 1) {
+				findUserNowPlaying(channel, args[1]);
+			} // if
 			break;
 		case "!top":
 			if (args.length > 1) {
 				findUserRecentArtists(channel, args[1]);
+			} // if
+			break;
+		case "!neighbours":
+			if (args.length > 1) {
+				findUserNeighbours(channel, args[1]);
 			} // if
 			break;
 		} // switch
@@ -75,10 +82,14 @@ public class Abbath extends PircBot {
 	 * @since 1.0
 	 */
 	protected void findUserNowPlaying(String channel, String username) {
-		String api_call = "http://ws.audioscrobbler.com/2.0/" +
-			"?method=user.getrecenttracks&user=" + username +
-			"&api_key=" + API_KEY + "&format=json";
-		sendMessage(channel, "This feature is currently in development.");
+		PaginatedResult<de.umass.lastfm.Track> tracks = de.umass.lastfm.User.getRecentTracks(
+			username, 1, 1, API_KEY);
+		string output = null;
+		for (de.umass.lastfm.Track tracks : track) {
+			output += track.getArtist + " " + track.getName();
+		} // for
+
+		sendMessage(channel, output);
 	} // ::findUserNowPlaying()
 
 	/**
@@ -90,7 +101,7 @@ public class Abbath extends PircBot {
 	 */
 	protected void findUserRecentArtists(String channel, String username) {
 		Collection<Artist> chart = de.umass.lastfm.User.getTopArtists(
-				username, Period.WEEK, API_KEY);
+			username, Period.WEEK, API_KEY);
 		String output = "Charts: ";
 		int i = 0;
 		String artist_list = null;
@@ -105,5 +116,20 @@ public class Abbath extends PircBot {
 		sendMessage(channel, output_t);
 	} // ::findUserRecentArtists()
 
+	protected void findUserNeighbours(String channel, String username) {
+		Collection<de.umass.lastfm.User> neighbours = de.umass.lastfm.User.getNeighbours(
+			username, 5, API_KEY);
+		String output = "Neighbours: ";
+		int i = 0;
+		String neighbour_list = null;
+		for (de.umass.lastfm.User neighbour : neighbours) {
+			if (i < 5) {
+				output += neighbour.getName() + ", ";
+			} // if
+			i++;
+		} // for
+		String output_t = output.substring(0, output.lastIndexOf(","));
+		sendMessage(channel, output_t);
+	} // ::findUserNeighbours()
 
 } // Abbath::
