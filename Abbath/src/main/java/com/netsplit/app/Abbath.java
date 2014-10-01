@@ -1,6 +1,5 @@
 package com.netsplit.app;
 import org.jibble.pircbot.*;
-import java.util.Date;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.io.BufferedReader;
