@@ -83,7 +83,7 @@ public class Abbath extends PircBot {
 	 */
 	protected void findUserNowPlaying(String channel, String username) {
 		PaginatedResult<de.umass.lastfm.Track> tracks = de.umass.lastfm.User.getRecentTracks(
-			username, 0, 1, API_KEY);
+				username, 0, 1, API_KEY);
 		String output = username+" is now playing ";
 		for (de.umass.lastfm.Track track : tracks) {
 			output += track.getArtist()+" \""+track.getName()+"\" ["+track.getAlbum()+"]";
@@ -101,14 +101,14 @@ public class Abbath extends PircBot {
 	 */
 	protected void findUserRecentArtists(String channel, String username) {
 		Collection<Artist> chart = de.umass.lastfm.User.getTopArtists(
-			username, Period.WEEK, API_KEY);
+				username, Period.WEEK, API_KEY);
 		String output = "Charts: ";
 		int i = 0;
 		String artist_list = null;
 		for (Artist artist : chart) {
 			if (i < 9) {
 				//System.out.println(artist.getName());
-				output += artist.getName() + "["+ artist.getPlaycount() +"], ";
+				output += artist.getName()+"["+ artist.getPlaycount()+"], ";
 			}
 			i++;
 		} // for
@@ -118,13 +118,13 @@ public class Abbath extends PircBot {
 
 	protected void findUserNeighbours(String channel, String username) {
 		Collection<de.umass.lastfm.User> neighbours = de.umass.lastfm.User.getNeighbours(
-			username, 5, API_KEY);
+				username, 5, API_KEY);
 		String output = "Neighbours: ";
 		int i = 0;
 		String neighbour_list = null;
 		for (de.umass.lastfm.User neighbour : neighbours) {
 			if (i < 5) {
-				output += neighbour.getName() + ", ";
+				output += neighbour.getName()+", ";
 			} // if
 			i++;
 		} // for
