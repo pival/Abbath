@@ -83,14 +83,14 @@ public class Abbath extends PircBot {
 	 */
 	protected void findUserNowPlaying(String channel, String username) {
 		PaginatedResult<de.umass.lastfm.Track> tracks = de.umass.lastfm.User.getRecentTracks(
-			username, 1, 1, API_KEY);
-		string output = null;
-		for (de.umass.lastfm.Track tracks : track) {
-			output += track.getArtist + " " + track.getName();
+			username, 0, 1, API_KEY);
+		String output = username+" is now playing ";
+		for (de.umass.lastfm.Track track : tracks) {
+			output += track.getArtist()+" \""+track.getName()+"\" ["+track.getAlbum()+"]";
 		} // for
 
 		sendMessage(channel, output);
-	} // ::findUserNowPlaying()
+	} // findUserNowPlaying()
 
 	/**
 	 * Display user's top 10 bands for the past week.
@@ -114,7 +114,7 @@ public class Abbath extends PircBot {
 		} // for
 		String output_t = output.substring(0, output.lastIndexOf(","));
 		sendMessage(channel, output_t);
-	} // ::findUserRecentArtists()
+	} // findUserRecentArtists()
 
 	protected void findUserNeighbours(String channel, String username) {
 		Collection<de.umass.lastfm.User> neighbours = de.umass.lastfm.User.getNeighbours(
@@ -130,6 +130,6 @@ public class Abbath extends PircBot {
 		} // for
 		String output_t = output.substring(0, output.lastIndexOf(","));
 		sendMessage(channel, output_t);
-	} // ::findUserNeighbours()
+	} // findUserNeighbours()
 
 } // Abbath::
