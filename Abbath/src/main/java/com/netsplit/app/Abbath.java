@@ -5,10 +5,16 @@ import java.net.URL;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.FileReader;
+import java.io.FileNotFoundException;
+import java.io.File;
 import org.json.*;
 import de.umass.lastfm.*;
 import java.text.DateFormat;
 import java.util.*;
+import java.io.InputStream;
+import java.io.FileInputStream;
+import java.io.*;
 
 public class Abbath extends PircBot {
 
@@ -17,6 +23,9 @@ public class Abbath extends PircBot {
 
 	// API Key
 	private static final String API_KEY = "0e9e588a8b4623f89de5af442ff28596";
+
+	// User data
+	private static final String user_data = "/home/mike/Projects/pirc/Abbath/users.csv";
 
 	public static void main(String[] args) throws Exception {
 		Abbath bot = new Abbath();
@@ -46,7 +55,6 @@ public class Abbath extends PircBot {
 	protected void onMessage(String channel, String sender,
 			String login, String hostname, String message) {
 		String[] args = message.split(" ");
-		System.out.println(Arrays.toString(args));
 
 		switch (args[0].toLowerCase()) {
 		case "!help":
@@ -70,8 +78,82 @@ public class Abbath extends PircBot {
 				findUserNeighbours(channel, args[1]);
 			} // if
 			break;
+		case "!whois":
+			if (args.length > 1) {
+				String user_name = get_user_data(channel, args[1]);
+				sendMessage(channel, user_name);
+			} // if
+			break;
 		} // switch
 	} // ::onMessage()
+
+	/*
+	protected void get_user_data(String channel, String nick) {
+		BufferedReader br = null;
+		String line = "";
+		String split_by = ",";
+
+		try {
+			br = new BufferedReader(new FileReader(user_data));
+			while ((line = br.readLine()) != null) {
+				String[] user_file_info = line.split(split_by);
+				for (String user_line : user_file_info) {
+					System.out.println(user_line);
+					//sendMessage(channel, user_line[1]);
+				} // for
+			} // while
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} // try
+	} // get_user_data()
+	*/
+
+	/*
+	protected void get_user_data(String channel, String nick) {
+		try {
+			Scanner scanner = new Scanner(new File(user_data));
+			scanner.useDelimiter(",");
+			while (scanner.hasNext()) {
+				System.out.print(scanner.next()+"\n");
+			} // while
+			scanner.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} // try
+	} // get_user_data()
+	*/
+
+	/**
+	 * @param string channel	Command issued here
+	 * @param string nick		User to search
+	 * @since 1.0
+	 */
+	protected static String get_user_data(String channel, String nick) {
+		Properties user_data = new Properties();
+
+		InputStream input = null;
+
+		try {
+			input = new FileInputStream("/home/mike/Projects/pirc/Abbath/user.properties");
+			user_data.load(input);
+			String user_name = user_data.getProperty(nick);
+
+			return user_name;
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (input != null)
+					input.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} // try
+		} // try
+
+		return null;
+	} // get_user_data()
 
 	/**
 	 * Display given user's now playing.
@@ -81,11 +163,13 @@ public class Abbath extends PircBot {
 	 * @since 1.0
 	 */
 	protected void findUserNowPlaying(String channel, String username) {
-		PaginatedResult<de.umass.lastfm.Track> tracks = de.umass.lastfm.User.getRecentTracks(
-				username, 0, 1, API_KEY);
+		PaginatedResult<de.umass.lastfm.Track> tracks =
+			de.umass.lastfm.User.getRecentTracks(username,
+				0, 1, API_KEY);
 		String output = username+" is now playing ";
 		for (de.umass.lastfm.Track track : tracks) {
-			output += track.getArtist()+" \""+track.getName()+"\" ["+track.getAlbum()+"]";
+			output += track.getArtist()+" \""+track.getName()
+				+"\" ["+track.getAlbum()+"]";
 		} // for
 
 		sendMessage(channel, output);
@@ -100,14 +184,15 @@ public class Abbath extends PircBot {
 	 */
 	protected void findUserRecentArtists(String channel, String username) {
 		Collection<Artist> chart = de.umass.lastfm.User.getTopArtists(
-				username, Period.WEEK, API_KEY);
+			username, Period.WEEK, API_KEY);
 		String output = "Charts: ";
 		int i = 0;
 		String artist_list = null;
 		for (Artist artist : chart) {
 			if (i < 9) {
 				//System.out.println(artist.getName());
-				output += artist.getName()+"["+ artist.getPlaycount()+"], ";
+				output += artist.getName()+"["
+					+artist.getPlaycount()+"], ";
 			}
 			i++;
 		} // for
