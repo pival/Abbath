@@ -25,7 +25,7 @@ public class Abbath extends PircBot {
 	private static final String API_KEY = "0e9e588a8b4623f89de5af442ff28596";
 
 	// User data
-	private static final String user_data = "/home/mike/Projects/pirc/Abbath/users.csv";
+	private static final String user_properties_file = "/home/mike/Projects/pirc/Abbath/user.properties";
 
 	public static void main(String[] args) throws Exception {
 		Abbath bot = new Abbath();
@@ -71,7 +71,9 @@ public class Abbath extends PircBot {
 				sendMessage(channel, sender + ": Hello World");
 				break;
 			case "!setuser":
-				// We're gonna need a bigger boat
+				if (args.length > 1) {
+					set_user_data(sender.toLowerCase(), args[1].toLowerCase());
+				} // if
 				break;
 			case "!np":
 				if (args.length > 1) {
@@ -137,8 +139,11 @@ public class Abbath extends PircBot {
 	*/
 
 	/**
+	 * Find a given user's Last.fm userid from user.properties file.
+	 *
 	 * @param string channel	Command issued here
 	 * @param string nick		User to search
+	 * @return string
 	 * @since 1.0
 	 */
 	protected static String get_user_data(String channel, String nick) {
@@ -167,6 +172,37 @@ public class Abbath extends PircBot {
 	} // get_user_data()
 
 	/**
+	 * Set a given user's Last.fm userid in the user.properties file.
+	 *
+	 * @param string nick	User who issued the command.
+	 * @param string userid	The userid they have specified.
+	 */
+	protected void set_user_data(String nick, String userid) {
+		Properties prop = new Properties();
+		final File props_file = new File(user_properties_file);
+		OutputStream output = null;
+
+		try {
+			prop.load(new FileInputStream(props_file));
+			//output = new FileOutputStream(user_properties_file);
+			prop.setProperty(nick, userid);
+
+			//prop.store(output, null);
+			prop.save(new FileOutputStream(props_file), "");
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (output != null) {
+				try {
+					output.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				} // catch
+			} // if
+		} // finally
+	} // set_user_data()
+
+	/**
 	 * Display given user's now playing.
 	 *
 	 * @param string channel	Where the command was issued
@@ -176,11 +212,23 @@ public class Abbath extends PircBot {
 	protected void findUserNowPlaying(String channel, String username) {
 		PaginatedResult<de.umass.lastfm.Track> tracks =
 			de.umass.lastfm.User.getRecentTracks(username,
-				0, 1, API_KEY);
-		String output = username+" is now playing ";
+				1, 1, API_KEY);
+		String output = username;
+		int i = 0;
 		for (de.umass.lastfm.Track track : tracks) {
-			output += track.getArtist()+" \""+track.getName()
-				+"\" ["+track.getAlbum()+"]";
+			if (i < 1) {
+				/*
+				if (track.getNowPlaying() == true) {
+					output += " is now playing ";
+				} else {
+					output = " last played ";
+				}
+				*/
+				System.out.println(track);
+				output += track.getArtist()+" \""+track.getName()
+					+"\" ["+track.getAlbum()+"]";
+			} // if
+			i++;
 		} // for
 
 		sendMessage(channel, output);
