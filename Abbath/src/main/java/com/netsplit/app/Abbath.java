@@ -56,35 +56,46 @@ public class Abbath extends PircBot {
 			String login, String hostname, String message) {
 		String[] args = message.split(" ");
 
-		switch (args[0].toLowerCase()) {
-		case "!help":
-			sendMessage(channel, sender + ": Hello World");
-			break;
-		case "!setuser":
-			// We're gonna need a bigger boat
-			break;
-		case "!np":
-			if (args.length > 1) {
-				findUserNowPlaying(channel, args[1]);
+		if (args[0].startsWith("!")) {
+			if (args.length < 2) {
+				String no_user_name = get_user_data(channel, sender.toLowerCase());
+				System.out.println(no_user_name);
+				String[] newArgs = new String[2];
+				newArgs[0] = args[0];
+				newArgs[1] = no_user_name;
+				args = newArgs;
 			} // if
-			break;
-		case "!top":
-			if (args.length > 1) {
-				findUserRecentArtists(channel, args[1]);
-			} // if
-			break;
-		case "!neighbours":
-			if (args.length > 1) {
-				findUserNeighbours(channel, args[1]);
-			} // if
-			break;
-		case "!whois":
-			if (args.length > 1) {
-				String user_name = get_user_data(channel, args[1]);
-				sendMessage(channel, user_name);
-			} // if
-			break;
-		} // switch
+
+			switch (args[0].toLowerCase()) {
+			case "!help":
+				sendMessage(channel, sender + ": Hello World");
+				break;
+			case "!setuser":
+				// We're gonna need a bigger boat
+				break;
+			case "!np":
+				if (args.length > 1) {
+					findUserNowPlaying(channel, args[1]);
+				} // if
+				break;
+			case "!top":
+				if (args.length > 1) {
+					findUserRecentArtists(channel, args[1]);
+				} // if
+				break;
+			case "!neighbours":
+				if (args.length > 1) {
+					findUserNeighbours(channel, args[1]);
+				} // if
+				break;
+			case "!whois":
+				if (args.length > 1) {
+					String user_name = get_user_data(channel, args[1].toLowerCase());
+					sendMessage(channel, user_name);
+				} // if
+				break;
+			} // switch
+		}
 	} // ::onMessage()
 
 	/*
