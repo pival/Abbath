@@ -25,7 +25,7 @@ public class Abbath extends PircBot {
 	private static final String API_KEY = "0e9e588a8b4623f89de5af442ff28596";
 
 	// User data
-	private static final String user_properties_file = "/home/mike/Projects/pirc/Abbath/user.properties";
+	private static final String user_properties_file = "/home/mike/Projects/pirc/user.properties";
 
 	public static void main(String[] args) throws Exception {
 		Abbath bot = new Abbath();
@@ -100,44 +100,6 @@ public class Abbath extends PircBot {
 		}
 	} // ::onMessage()
 
-	/*
-	protected void get_user_data(String channel, String nick) {
-		BufferedReader br = null;
-		String line = "";
-		String split_by = ",";
-
-		try {
-			br = new BufferedReader(new FileReader(user_data));
-			while ((line = br.readLine()) != null) {
-				String[] user_file_info = line.split(split_by);
-				for (String user_line : user_file_info) {
-					System.out.println(user_line);
-					//sendMessage(channel, user_line[1]);
-				} // for
-			} // while
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} // try
-	} // get_user_data()
-	*/
-
-	/*
-	protected void get_user_data(String channel, String nick) {
-		try {
-			Scanner scanner = new Scanner(new File(user_data));
-			scanner.useDelimiter(",");
-			while (scanner.hasNext()) {
-				System.out.print(scanner.next()+"\n");
-			} // while
-			scanner.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} // try
-	} // get_user_data()
-	*/
-
 	/**
 	 * Find a given user's Last.fm userid from user.properties file.
 	 *
@@ -152,7 +114,7 @@ public class Abbath extends PircBot {
 		InputStream input = null;
 
 		try {
-			input = new FileInputStream("/home/mike/Projects/pirc/Abbath/user.properties");
+			input = new FileInputStream(user_properties_file);
 			user_data.load(input);
 			String user_name = user_data.getProperty(nick);
 
@@ -184,10 +146,7 @@ public class Abbath extends PircBot {
 
 		try {
 			prop.load(new FileInputStream(props_file));
-			//output = new FileOutputStream(user_properties_file);
 			prop.setProperty(nick, userid);
-
-			//prop.store(output, null);
 			prop.save(new FileOutputStream(props_file), "");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -217,16 +176,15 @@ public class Abbath extends PircBot {
 		int i = 0;
 		for (de.umass.lastfm.Track track : tracks) {
 			if (i < 1) {
-				/*
-				if (track.getNowPlaying() == true) {
+				// We need to get the trackinfo here
+				if (track.isNowPlaying()) {
 					output += " is now playing ";
 				} else {
-					output = " last played ";
+					output += " last played ";
 				}
-				*/
-				System.out.println(track);
-				output += track.getArtist()+" \""+track.getName()
-					+"\" ["+track.getAlbum()+"]";
+				//System.out.println(track);
+				output += track.getArtist()+" - "+track.getName()
+					+" \""+track.getAlbum()+"\" []";
 			} // if
 			i++;
 		} // for

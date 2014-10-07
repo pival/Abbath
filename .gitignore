@@ -40,6 +40,9 @@ Thumbs.db
 ###########
 *.bak
 backup/*
+.swp
+.swap
+.sw0
 
 # Java documentation #
 ######################
